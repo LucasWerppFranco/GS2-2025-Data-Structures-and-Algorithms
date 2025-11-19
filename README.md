@@ -60,6 +60,12 @@ Tanto as explicaçoes quanto o código estão divididos com base nas técnicas q
     
 - **Funcionalidades**: O programa permite adicionar cursos/alunos, inscrever (enfileirar), processar (desenfileirar), ordenar, buscar e undo. É completo e focado em eficiência.
 
+# EXTRA
+
+Como um projeto extra para somar na GS, eu desenvolvi um projeto de mentoria inteligente utilizando o Gemini para encontrar o melhor mentor que atenda os requisitos para seu mentorado.
+
+[Clique aqui para checar!](https://github.com/LucasWerppFranco/GS2-2025-Data-Structures-and-Algorithms/tree/main/Mentoria-Inteligente)
+
 ---
 
 ## Membros do Trabalho
@@ -69,9 +75,3 @@ Tanto as explicaçoes quanto o código estão divididos com base nas técnicas q
 - Massayoshi Bando | RM: 561779
 
 ---
-
-# EXTRA
-
-Como um projeto extra para somar na GS, eu desenvolvi um projeto de mentoria inteligente utilizando o Gemini para encontrar o melhor mentor que atenda os requisitos para seu mentorado.
-
-[Clique aqui para checar!](https://github.com/LucasWerppFranco/GS2-2025-Data-Structures-and-Algorithms/tree/main/Mentoria-Inteligente)
