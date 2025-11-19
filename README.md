@@ -23,6 +23,8 @@
 
 Nesta atividade foi solicitado o uso de IAs como apoio ao raciocínio algorítmico na criação de um programa a nossa escolha com o tema "O Futuro do Trabalho". Eu utilizei o [blackbox.ai](https://www.blackbox.ai/) para para elaborar essa etapa utilizando engenharia de prompt para garantir o funcioinamento e a otimização do programa.
 
+> ⚠️ **Attention:** - No fim do README.md existe um projeto extra elaborado para complementar a GS, por favor acesse para conferir. 😉
+
 ## Prompt Utilizado:
 
 ```
@@ -57,3 +59,19 @@ Tanto as explicaçoes quanto o código estão divididos com base nas técnicas q
   - Algoritmos escolhidos são eficientes para os tamanhos esperados (até 1000 cursos/alunos, 10000 inscrições).
     
 - **Funcionalidades**: O programa permite adicionar cursos/alunos, inscrever (enfileirar), processar (desenfileirar), ordenar, buscar e undo. É completo e focado em eficiência.
+
+---
+
+## Membros do Trabalho
+
+- Lucas Franco | RM: 556044
+- Lucca Rosseto Rezende | RM: 564180
+- Massayoshi Bando | RM: 561779
+
+---
+
+# EXTRA
+
+Como um projeto extra para somar na GS, eu desenvolvi um projeto de mentoria inteligente utilizando o Gemini para encontrar o melhor mentor que atenda os requisitos para seu mentorado.
+
+[Clique aqui para checar!](https://github.com/LucasWerppFranco/GS2-2025-Data-Structures-and-Algorithms/tree/main/Mentoria-Inteligente)
