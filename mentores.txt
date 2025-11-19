@@ -1,0 +1,4 @@
+Carlos Silva;Inteligência Artificial;8
+Mariana Torres;Cibersegurança;5
+João Ferreira;Desenvolvimento de Jogos;6
+
