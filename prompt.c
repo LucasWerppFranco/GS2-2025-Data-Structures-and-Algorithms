@@ -5,7 +5,9 @@
 
 // Definições de constantes para otimização
 #define MAX_NOME 50
-#define INCREMENTO_CAPACIDADE 10  // Incremento para realloc
+#define MAX_CURSOS 1000
+#define MAX_ALUNOS 1000
+#define MAX_INSCRICOES 10000
 
 // TAD: Struct para Curso
 typedef struct {
@@ -50,33 +52,11 @@ typedef struct {
     int tamanho;
 } Pilha;
 
-// Arrays dinâmicos para cursos e alunos
-Curso* cursos = NULL;
+// Arrays globais para cursos e alunos (para busca e ordenação)
+Curso cursos[MAX_CURSOS];
 int num_cursos = 0;
-int capacidade_cursos = 0;
-
-Aluno* alunos = NULL;
+Aluno alunos[MAX_ALUNOS];
 int num_alunos = 0;
-int capacidade_alunos = 0;
-
-// Função para limpar a tela (cross-platform)
-void limparTela() {
-    #ifdef _WIN32
-    system("cls");
-    #else
-    system("clear");
-    #endif
-}
-
-// Função para esperar 'q' e limpar tela
-void esperarELimpar() {
-    printf("Pressione 'q' para voltar ao menu...\n");
-    while (getchar() != '\n'); // Limpar buffer
-    char ch = getchar();
-    if (ch == 'q') {
-        limparTela();
-    }
-}
 
 // Funções para Fila
 void inicializarFila(Fila* f) {
@@ -204,86 +184,12 @@ int buscaLinearAluno(Aluno arr[], int n, int id) {
     return -1;
 }
 
-// Função para expandir array dinâmico
-void expandirCursos() {
-    capacidade_cursos += INCREMENTO_CAPACIDADE;
-    cursos = (Curso*)realloc(cursos, capacidade_cursos * sizeof(Curso));
-    if (!cursos) {
-        printf("Erro: Falha na realocação de memória para cursos.\n");
-        exit(1);
-    }
-}
-
-void expandirAlunos() {
-    capacidade_alunos += INCREMENTO_CAPACIDADE;
-    alunos = (Aluno*)realloc(alunos, capacidade_alunos * sizeof(Aluno));
-    if (!alunos) {
-        printf("Erro: Falha na realocação de memória para alunos.\n");
-        exit(1);
-    }
-}
-
-// Função para carregar cursos do arquivo
-void carregarCursos() {
-    FILE* arquivo = fopen("cursos.txt", "r");
-    if (!arquivo) {
-        printf("Arquivo cursos.txt não encontrado. Criando novo.\n");
-        return;
-    }
-    char linha[256];
-    while (fgets(linha, sizeof(linha), arquivo)) {
-        if (num_cursos >= capacidade_cursos) expandirCursos();
-        sscanf(linha, "%[^,],%d,%d", cursos[num_cursos].nome, &cursos[num_cursos].duracao, &cursos[num_cursos].prioridade);
-        num_cursos++;
-    }
-    fclose(arquivo);
-}
-
-// Função para salvar cursos no arquivo
-void salvarCursos() {
-    FILE* arquivo = fopen("cursos.txt", "w");
-    if (!arquivo) {
-        printf("Erro ao abrir cursos.txt para escrita.\n");
-        return;
-    }
-    for (int i = 0; i < num_cursos; i++) {
-        fprintf(arquivo, "%s,%d,%d\n", cursos[i].nome, cursos[i].duracao, cursos[i].prioridade);
-    }
-    fclose(arquivo);
-}
-
-// Função para carregar alunos do arquivo
-void carregarAlunos() {
-    FILE* arquivo = fopen("alunos.txt", "r");
-    if (!arquivo) {
-        printf("Arquivo alunos.txt não encontrado. Criando novo.\n");
-        return;
-    }
-    char linha[256];
-    while (fgets(linha, sizeof(linha), arquivo)) {
-        if (num_alunos >= capacidade_alunos) expandirAlunos();
-        sscanf(linha, "%[^,],%d", alunos[num_alunos].nome, &alunos[num_alunos].id);
-        num_alunos++;
-    }
-    fclose(arquivo);
-}
-
-// Função para salvar alunos no arquivo
-void salvarAlunos() {
-    FILE* arquivo = fopen("alunos.txt", "w");
-    if (!arquivo) {
-        printf("Erro ao abrir alunos.txt para escrita.\n");
-        return;
-    }
-    for (int i = 0; i < num_alunos; i++) {
-        fprintf(arquivo, "%s,%d\n", alunos[i].nome, alunos[i].id);
-    }
-    fclose(arquivo);
-}
-
 // Função para adicionar curso
 void adicionarCurso() {
-    if (num_cursos >= capacidade_cursos) expandirCursos();
+    if (num_cursos >= MAX_CURSOS) {
+        printf("Erro: Limite de cursos atingido.\n");
+        return;
+    }
     printf("Nome do curso: ");
     scanf(" %[^\n]", cursos[num_cursos].nome);
     printf("Duração (horas): ");
@@ -296,7 +202,10 @@ void adicionarCurso() {
 
 // Função para adicionar aluno
 void adicionarAluno() {
-    if (num_alunos >= capacidade_alunos) expandirAlunos();
+    if (num_alunos >= MAX_ALUNOS) {
+        printf("Erro: Limite de alunos atingido.\n");
+        return;
+    }
     printf("Nome do aluno: ");
     scanf(" %[^\n]", alunos[num_alunos].nome);
     printf("ID do aluno: ");
@@ -381,10 +290,6 @@ void undo(Pilha* historico) {
 
 // Menu principal
 int main() {
-    // Carregar dados dos arquivos
-    carregarCursos();
-    carregarAlunos();
-
     Fila fila_inscricoes;
     Pilha historico;
     inicializarFila(&fila_inscricoes);
@@ -405,25 +310,19 @@ int main() {
         scanf("%d", &opcao);
 
         switch (opcao) {
-            case 1: adicionarCurso(); esperarELimpar(); break;
-            case 2: adicionarAluno(); esperarELimpar(); break;
-            case 3: inscreverAluno(&fila_inscricoes, &historico); esperarELimpar(); break;
-            case 4: processarInscricao(&fila_inscricoes, &historico); esperarELimpar(); break;
-            case 5: ordenarCursos(); esperarELimpar(); break;
-            case 6: buscarCurso(); esperarELimpar(); break;
-            case 7: undo(&historico); esperarELimpar(); break;
+            case 1: adicionarCurso(); break;
+            case 2: adicionarAluno(); break;
+            case 3: inscreverAluno(&fila_inscricoes, &historico); break;
+            case 4: processarInscricao(&fila_inscricoes, &historico); break;
+            case 5: ordenarCursos(); break;
+            case 6: buscarCurso(); break;
+            case 7: undo(&historico); break;
             case 0: printf("Saindo...\n"); break;
-            default: printf("Opção inválida.\n"); esperarELimpar(); break;
+            default: printf("Opção inválida.\n");
         }
     } while (opcao != 0);
 
-    // Salvar dados nos arquivos
-    salvarCursos();
-    salvarAlunos();
-
     // Liberar memória (otimização: evitar vazamentos)
-    free(cursos);
-    free(alunos);
     while (!filaVazia(&fila_inscricoes)) desenfileirar(&fila_inscricoes);
     while (!pilhaVazia(&historico)) free(desempilhar(&historico));
 

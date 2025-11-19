@@ -1,0 +1,2 @@
+Ciencia da computação,100,10
+1,0,0
