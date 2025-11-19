@@ -81,6 +81,10 @@ Caso queira compilar na sua mquina, disponibilizarei o comando para compilar a v
 apt-get update && apt-get install -y
 ```
 
+# Video do Projeto
+
+Video disponivel no [YouTube](https://youtu.be/QEJWnRzxiKA).
+
 # EXTRA
 
 Como um projeto extra para somar na GS, eu desenvolvi um programa de mentoria inteligente em C utilizando o Gemini para encontrar o melhor mentor que atenda os requisitos que melhor atenda seu mentorado.
