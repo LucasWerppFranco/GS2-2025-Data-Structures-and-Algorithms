@@ -37,7 +37,7 @@ Foque na otimização do código.
 
 O código gerado está presente no arquivo:
 
-- [main.c](https://github.com/LucasWerppFranco/GS2-2025-Data-Structures-and-Algorithms/blob/main/main.c)
+- [prompt.c](https://github.com/LucasWerppFranco/GS2-2025-Data-Structures-and-Algorithms/blob/main/prompt.c)
 
 Tanto as explicaçoes quanto o código estão divididos com base nas técnicas que foram aplicadas em sua elaboração, mostrando como elas foram utilizadas no projeto e enfatizando o aprendizado que tive no decorrer do ano:
 
