@@ -1,6 +1,3 @@
-// ===========================================================
-// SISTEMA DE MENTORIA INTELIGENTE – ARQUIVO ÚNICO
-// ===========================================================
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,19 +10,17 @@
 #include <curl/curl.h>
 #include <cjson/cJSON.h>
 
-// -----------------------------------------------------------
 // DEFINIÇÕES
-// -----------------------------------------------------------
+
 #define WIDTH 60
 #define ARQ_MENTORES "mentores.txt"
 #define ARQ_MENTORADOS "mentorados.txt"
 #define ARQ_PROMPT "prompt.txt"
-#define GEMINI_API_KEY "AIzaSyA_bm2VqGRcWrkHOD-QwyiO_gPN4SV0PEA"
+#define GEMINI_API_KEY "API_KEY"  // Adicione sua chave de API do Gemini aqui
 #define GEMINI_URL "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=" GEMINI_API_KEY
 
-// -----------------------------------------------------------
 // ESTRUTURAS
-// -----------------------------------------------------------
+
 typedef struct {
     char nome[100];
     char area[100];
@@ -37,16 +32,13 @@ typedef struct {
     char objetivo[200];
 } Mentorado;
 
-// Estrutura para resposta do cURL
 struct MemoryStruct {
     char *memory;
     size_t size;
 };
 
-// -----------------------------------------------------------
 // FUNÇÕES DE INTERFACE
-// -----------------------------------------------------------
-// Calcula largura visual UTF-8
+
 int visual_width(const char *s) {
     int width = 0;
     wchar_t wc;
@@ -85,7 +77,6 @@ void print_line(const char *text) {
     printf("║\n");
 }
 
-// Exibe texto multilinha (quebra por '\n')
 void mostrarTextoMultiline(const char *texto) {
     print_border_top();
     if (!texto || texto[0] == '\0') {
@@ -94,13 +85,11 @@ void mostrarTextoMultiline(const char *texto) {
         char *dup = strdup(texto);
         char *line = strtok(dup, "\n");
         while (line) {
-            // Se a linha for maior que o WIDTH-2, quebra em pedaços menores
             int max_chars = WIDTH - 2;
             int len = (int)strlen(line);
             if (len <= max_chars) {
                 print_line(line);
             } else {
-                // quebra por caracteres (não perfeito para utf8, mas funcional)
                 int start = 0;
                 while (start < len) {
                     char buf[1024] = {0};
@@ -118,7 +107,6 @@ void mostrarTextoMultiline(const char *texto) {
     print_border_bottom();
 }
 
-// Entrada de teclado
 void limparBufferEntrada() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
@@ -133,10 +121,9 @@ int capturaTecla() {
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
     ch = getchar();
     if (ch == 27) {
-        // sequência de escape
-        int next1 = getchar(); // possivelmente '['
+        int next1 = getchar();
         (void)next1;
-        int next2 = getchar(); // A/B/C/D
+        int next2 = getchar();
         if (next2 == 'A') ch = 'w';
         else if (next2 == 'B') ch = 's';
         else if (next2 == 'C') ch = 'd';
@@ -159,7 +146,6 @@ void esperarPressionarQ() {
     } while (1);
 }
 
-// Confirmação de remoção: retorna 1 se 'y', 0 se 'n'
 int confirmarRemocao(const char *mensagem) {
     char input[10];
     print_border_top();
@@ -175,10 +161,8 @@ int confirmarRemocao(const char *mensagem) {
     } while (1);
 }
 
-// -----------------------------------------------------------
 // FUNÇÕES DE DADOS
-// -----------------------------------------------------------
-// Carrega mentores do arquivo para memória
+
 int carregarMentores(Mentor **lista) {
     FILE *f = fopen(ARQ_MENTORES, "r");
     if (!f) return 0;
@@ -194,7 +178,6 @@ int carregarMentores(Mentor **lista) {
     return count;
 }
 
-// Carrega mentorados do arquivo para memória
 int carregarMentorados(Mentorado **lista) {
     FILE *f = fopen(ARQ_MENTORADOS, "r");
     if (!f) return 0;
@@ -210,9 +193,8 @@ int carregarMentorados(Mentorado **lista) {
     return count;
 }
 
-// Salva todos os mentores da memória para o arquivo (reescreve o arquivo)
 void salvarMentores(Mentor *lista, int total) {
-    FILE *f = fopen(ARQ_MENTORES, "w");  // Modo "w" para reescrever
+    FILE *f = fopen(ARQ_MENTORES, "w");
     if (!f) return;
     for (int i = 0; i < total; i++) {
         fprintf(f, "%s;%s;%d\n", lista[i].nome, lista[i].area, lista[i].experiencia);
@@ -220,9 +202,8 @@ void salvarMentores(Mentor *lista, int total) {
     fclose(f);
 }
 
-// Salva todos os mentorados da memória para o arquivo (reescreve o arquivo)
 void salvarMentorados(Mentorado *lista, int total) {
-    FILE *f = fopen(ARQ_MENTORADOS, "w");  // Modo "w" para reescrever
+    FILE *f = fopen(ARQ_MENTORADOS, "w");
     if (!f) return;
     for (int i = 0; i < total; i++) {
         fprintf(f, "%s;%s\n", lista[i].nome, lista[i].objetivo);
@@ -230,7 +211,6 @@ void salvarMentorados(Mentorado *lista, int total) {
     fclose(f);
 }
 
-// Adiciona mentor apenas em memória (persistência será feita ao salvar)
 int adicionarMentor(Mentor **lista, int total, Mentor novo) {
     Mentor *res = realloc(*lista, sizeof(Mentor) * (total + 1));
     if (!res) return total;
@@ -239,7 +219,6 @@ int adicionarMentor(Mentor **lista, int total, Mentor novo) {
     return total + 1;
 }
 
-// Adiciona mentorado apenas em memória (persistência será feita ao salvar)
 int adicionarMentorado(Mentorado **lista, int total, Mentorado novo) {
     Mentorado *res = realloc(*lista, sizeof(Mentorado) * (total + 1));
     if (!res) return total;
@@ -248,46 +227,38 @@ int adicionarMentorado(Mentorado **lista, int total, Mentorado novo) {
     return total + 1;
 }
 
-// Remove mentor da memória pelo índice (shift dos elementos restantes)
 int removerMentor(Mentor **lista, int total, int indice) {
-    if (indice < 0 || indice >= total) return total;  // Índice inválido
-    // Shift dos elementos após o índice
+    if (indice < 0 || indice >= total) return total;
     for (int i = indice; i < total - 1; i++) {
         (*lista)[i] = (*lista)[i + 1];
     }
-    // Reduz o tamanho da array
     if (total - 1 == 0) {
         free(*lista);
         *lista = NULL;
         return 0;
     }
     Mentor *res = realloc(*lista, sizeof(Mentor) * (total - 1));
-    if (res || total == 1) *lista = res;  // Se realloc falhar e total > 1, mantém o original
+    if (res || total == 1) *lista = res;
     return total - 1;
 }
 
-// Remove mentorado da memória pelo índice (shift dos elementos restantes)
 int removerMentorado(Mentorado **lista, int total, int indice) {
-    if (indice < 0 || indice >= total) return total;  // Índice inválido
-    // Shift dos elementos após o índice
+    if (indice < 0 || indice >= total) return total;
     for (int i = indice; i < total - 1; i++) {
         (*lista)[i] = (*lista)[i + 1];
     }
-    // Reduz o tamanho da array
     if (total - 1 == 0) {
         free(*lista);
         *lista = NULL;
         return 0;
     }
     Mentorado *res = realloc(*lista, sizeof(Mentorado) * (total - 1));
-    if (res || total == 1) *lista = res;  // Se realloc falhar e total > 1, mantém o original
+    if (res || total == 1) *lista = res;
     return total - 1;
 }
 
-// -----------------------------------------------------------
 // FUNÇÕES DA API DO GEMINI
-// -----------------------------------------------------------
-// Callback para cURL escrever resposta
+
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
     size_t realsize = size * nmemb;
     struct MemoryStruct *mem = (struct MemoryStruct *)userp;
@@ -300,8 +271,6 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
     return realsize;
 }
 
-// Chama a API do Gemini e retorna a resposta gerada (ou NULL).
-// Em caso de erro, imprime mensagens detalhadas de debug/erro.
 char* chamarGemini(const char *url, const char *prompt) {
     CURL *curl;
     CURLcode res;
@@ -317,7 +286,6 @@ char* chamarGemini(const char *url, const char *prompt) {
         return NULL;
     }
 
-    // Monta o JSON do corpo da requisição (adapte se quiser role:user)
     cJSON *root = cJSON_CreateObject();
     cJSON *contents = cJSON_AddArrayToObject(root, "contents");
     cJSON *content = cJSON_CreateObject();
@@ -340,12 +308,10 @@ char* chamarGemini(const char *url, const char *prompt) {
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
-    // Opcional: timeout curto para não travar indefinidamente
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30L);
 
     res = curl_easy_perform(curl);
 
-    // Pega código HTTP (se disponível)
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
 
     if (res != CURLE_OK) {
@@ -360,13 +326,11 @@ char* chamarGemini(const char *url, const char *prompt) {
         return NULL;
     }
 
-    // Se servidor respondeu com status HTTP >=400, imprime detalhe e tenta parsear JSON de erro
     if (http_code >= 400) {
         fprintf(stderr, "HTTP error: %ld\n", http_code);
         if (chunk.size > 0 && chunk.memory) {
             fprintf(stderr, "Resposta bruta:\n%s\n", chunk.memory);
 
-            // Tenta parsear JSON e extrair campo "error"
             cJSON *resp = cJSON_Parse(chunk.memory);
             if (resp) {
                 cJSON *error = cJSON_GetObjectItem(resp, "error");
@@ -381,7 +345,6 @@ char* chamarGemini(const char *url, const char *prompt) {
                     }
                     if (status) fprintf(stderr, "API error.status: %s\n", cJSON_GetStringValue(status));
                 } else {
-                    // Às vezes a API retorna { "error": { ... } } ou { "errorMessage": "..."}
                     cJSON *errMsg = cJSON_GetObjectItem(resp, "errorMessage");
                     if (errMsg) fprintf(stderr, "API errorMessage: %s\n", cJSON_GetStringValue(errMsg));
                 }
@@ -400,7 +363,6 @@ char* chamarGemini(const char *url, const char *prompt) {
         return NULL;
     }
 
-    // Se chegamos aqui, HTTP ok (2xx). Parseia o JSON e tenta extrair a resposta em candidates->content->parts->text
     cJSON *response = cJSON_Parse(chunk.memory);
     if (response) {
         cJSON *candidates = cJSON_GetObjectItem(response, "candidates");
@@ -424,7 +386,6 @@ char* chamarGemini(const char *url, const char *prompt) {
                 }
             }
         }
-        // Se não encontrou o campo esperado, imprime a resposta e retorna NULL
         fprintf(stderr, "Resposta JSON recebida, mas campo esperado não encontrado. Resposta bruta:\n%s\n", chunk.memory);
         cJSON_Delete(response);
     } else {
@@ -439,7 +400,6 @@ char* chamarGemini(const char *url, const char *prompt) {
     return NULL;
 }
 
-// Lê prompt base de ARQ_PROMPT, se existir; caso contrário retorna uma string default (caller deve free)
 char* carregarPromptBase() {
     FILE *f = fopen(ARQ_PROMPT, "r");
     if (!f) {
@@ -457,12 +417,11 @@ char* carregarPromptBase() {
     return buf;
 }
 
-// -----------------------------------------------------------
 // PROGRAMA PRINCIPAL
-// -----------------------------------------------------------
+
 int main() {
     setlocale(LC_ALL, "");
-    curl_global_init(CURL_GLOBAL_DEFAULT);  // Inicializa cURL
+    curl_global_init(CURL_GLOBAL_DEFAULT);
     Mentor *mentores = NULL;
     Mentorado *mentorados = NULL;
     int totalMentores = carregarMentores(&mentores);
