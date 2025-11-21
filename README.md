@@ -33,7 +33,7 @@ Utilize algoritimos de Busca, Ordenação, TAD, Fila e Pilha para que o prograna
 Foque na otimização do código.
 ```
 
-## Analise Técnica do Código Gerad
+## Analise Técnica do Código Gerado
 
 O código gerado está presente no arquivo:
 
